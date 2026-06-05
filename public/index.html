@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLATO Alignment Converter — ASU Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --burgundy: #8C1D40;
+    --burgundy-dark: #6e1532;
+    --burgundy-light: #f7eaee;
+    --gold: #FFC627;
+    --gold-light: #fff8e6;
+    --black: #1a1a1a;
+    --grey-dark: #3B3838;
+    --grey-mid: #6b6b6b;
+    --grey-light: #f4f4f4;
+    --border: #e2e2e2;
+    --white: #ffffff;
+    --success: #2d6a4f;
+    --success-bg: #d8f3dc;
+    --error: #9b2226;
+    --error-bg: #fde8e8;
+    --info: #1d4e89;
+    --info-bg: #e8f0fb;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background: #f8f5f5;
+    color: var(--black);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--burgundy);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(140,29,64,0.25);
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--burgundy);
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.2px;
+  }
+
+  header p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 1px;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 580px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--burgundy);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--burgundy-light);
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--grey-light);
+    position: relative;
+  }
+
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--burgundy);
+    background: var(--burgundy-light);
+  }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 0.75rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .drop-icon svg { color: var(--burgundy); }
+
+  .drop-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--grey-dark);
+    margin-bottom: 4px;
+  }
+
+  .drop-sub {
+    font-size: 12px;
+    color: var(--grey-mid);
+  }
+
+  .file-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--burgundy-light);
+    border: 1px solid #e5bcc8;
+    border-radius: var(--radius);
+    padding: 0.65rem 0.9rem;
+    margin-top: 0.75rem;
+  }
+
+  .file-pill svg { color: var(--burgundy); flex-shrink: 0; }
+
+  .file-pill-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--burgundy-dark);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-pill-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--burgundy);
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: background 0.1s;
+  }
+
+  .file-pill-clear:hover { background: #f0d0db; }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+
+  .field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--grey-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .field input {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--black);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+
+  .field input:focus {
+    border-color: var(--burgundy);
+    box-shadow: 0 0 0 3px rgba(140,29,64,0.1);
+  }
+
+  .convert-btn {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    background: var(--burgundy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+
+  .convert-btn:hover:not(:disabled) { background: var(--burgundy-dark); }
+  .convert-btn:active:not(:disabled) { transform: scale(0.99); }
+  .convert-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .progress-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .progress-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--burgundy);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--grey-mid);
+    text-align: right;
+  }
+
+  .status {
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .status.info    { background: var(--info-bg);    color: var(--info);    display: flex; }
+  .status.success { background: var(--success-bg); color: var(--success); display: flex; }
+  .status.error   { background: var(--error-bg);   color: var(--error);   display: flex; }
+
+  .status svg { flex-shrink: 0; margin-top: 1px; }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 11px;
+    color: var(--grey-mid);
+  }
+
+  @media (max-width: 480px) {
+    .field-grid { grid-template-columns: 1fr; }
+    header { padding: 1rem; }
+    main { padding: 1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">ASU</div>
+  <div>
+    <h1>PLATO Alignment Converter</h1>
+    <p>Edmentum PDF → ASU Prep formatted Excel · No API key required</p>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <div class="card">
+      <div class="card-label">1 — Upload PDF</div>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".pdf" aria-label="Upload PDF">
+        <div class="drop-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <div class="drop-label">Drop your Edmentum correlation PDF</div>
+        <div class="drop-sub">or click to browse — PDF files only</div>
+      </div>
+      <div class="file-pill" id="filePill" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="file-pill-name" id="fileName"></span>
+        <button class="file-pill-clear" id="fileClear" aria-label="Remove file">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">2 — Settings</div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="gradeInput">Grade / course label</label>
+          <input type="text" id="gradeInput" placeholder="e.g. Grade 7 ELA" value="Grade 7 ELA">
+        </div>
+        <div class="field">
+          <label for="stateInput">State</label>
+          <input type="text" id="stateInput" placeholder="e.g. North Carolina" value="North Carolina">
+        </div>
+      </div>
+    </div>
+
+    <button class="convert-btn" id="convertBtn" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Convert to Excel
+    </button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">0%</div>
+    </div>
+
+    <div class="status" id="statusBox" role="status">
+      <svg id="statusIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+      <span id="statusMsg"></span>
+    </div>
+
+  </div>
+</main>
+
+<footer>ASU Preparatory Academy · Standards Alignment Tools</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const dropZone    = document.getElementById('dropZone');
+const fileInput   = document.getElementById('fileInput');
+const filePill    = document.getElementById('filePill');
+const fileName    = document.getElementById('fileName');
+const fileClear   = document.getElementById('fileClear');
+const convertBtn  = document.getElementById('convertBtn');
+const statusBox   = document.getElementById('statusBox');
+const statusMsg   = document.getElementById('statusMsg');
+const statusIcon  = document.getElementById('statusIcon');
+const progressWrap= document.getElementById('progressWrap');
+const progressFill= document.getElementById('progressFill');
+const progressLabel=document.getElementById('progressLabel');
+
+let selectedFile = null;
+
+const ICONS = {
+  info:    '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  success: '<polyline points="20 6 9 17 4 12"/>',
+  error:   '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+};
+
+function setProgress(pct, label) {
+  progressWrap.style.display = 'flex';
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = label || pct + '%';
+}
+
+function showStatus(type, msg) {
+  statusBox.className = 'status ' + type;
+  statusMsg.textContent = msg;
+  statusIcon.innerHTML = ICONS[type] || ICONS.info;
+}
+
+function hideStatus() {
+  statusBox.className = 'status';
+  statusBox.style.display = 'none';
+}
+
+function checkReady() {
+  convertBtn.disabled = !selectedFile;
+}
+
+function setFile(f) {
+  if (!f) return;
+  if (f.type !== 'application/pdf') {
+    showStatus('error', 'Please select a PDF file.');
+    return;
+  }
+  selectedFile = f;
+  fileName.textContent = f.name;
+  filePill.style.display = 'flex';
+  dropZone.querySelector('.drop-label').textContent = 'File selected';
+  checkReady();
+}
+
+fileInput.addEventListener('change', e => setFile(e.target.files[0]));
+
+fileClear.addEventListener('click', e => {
+  e.stopPropagation();
+  selectedFile = null;
+  fileInput.value = '';
+  filePill.style.display = 'none';
+  dropZone.querySelector('.drop-label').textContent = 'Drop your Edmentum correlation PDF';
+  checkReady();
+  hideStatus();
+});
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  setFile(e.dataTransfer.files[0]);
+});
+
+async function extractPdfText(arrayBuffer, onProgress) {
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const content = await page.getTextContent();
+    let pageText = '';
+    for (const item of content.items) {
+      if ('str' in item) {
+        pageText += item.str;
+        if (item.hasEOL) pageText += '\n';
+      }
+    }
+    fullText += pageText + '\n';
+    if (onProgress) onProgress(p, pdf.numPages);
+  }
+  return fullText;
+}
+
+function parseEdmentumText(text) {
+  // Keys = text found in PDF; values = canonical names used in output
+  const STRAND_MAP = {
+    'Reading: Literature':        'Reading: Literature',
+    'Reading: Informational Text':'Reading: Informational Text',
+    'Writing':                    'Writing',
+    'Speaking and Listening':     'Speaking & Listening',
+    'Language':                   'Language'
+  };
+  const STRAND_NAMES = Object.keys(STRAND_MAP);
+
+  const STD_CODE_RE = /^([A-Z]{1,2}\.\d+\.\d+[a-z]*)\.?\s+(.+)/;
+  const SEMESTER_RE = /^PLATO Course .+, Semester [A-Z]/;
+  const UNIT_RE = /^Unit (\d+|Activity):/;
+  const NOT_ADDRESSED = 'The selected PLATO curriculum does not address this learning expectation.';
+  const CCR_RE = /^CCR Anchor Standard/;
+  const PAGE_NUM_RE = /^\d+$/;
+
+  const result = { strands: [] };
+  let currentStrand = null;
+  let currentStandard = null;
+  let currentSemester = null;
+  let currentUnit = null;
+  let collectingText = false;
+  let skipUntilCode = false;
+
+  function getOrCreateStrand(name) {
+    let s = result.strands.find(x => x.name === name);
+    if (!s) { s = { name, standards: [] }; result.strands.push(s); }
+    return s;
+  }
+
+  function saveStandard() {
+    if (currentStandard && currentStrand) {
+      // Clean up text (collapse whitespace)
+      currentStandard.text = currentStandard.text.replace(/\s+/g, ' ').trim();
+      getOrCreateStrand(currentStrand).standards.push(currentStandard);
+    }
+    currentStandard = null;
+    currentSemester = null;
+    currentUnit = null;
+    collectingText = false;
+  }
+
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+  for (const line of lines) {
+    // Skip page numbers (standalone digits)
+    if (PAGE_NUM_RE.test(line)) continue;
+
+    // Strand header
+    if (STRAND_NAMES.includes(line)) {
+      saveStandard();
+      currentStrand = STRAND_MAP[line];
+      skipUntilCode = false;
+      continue;
+    }
+
+    // CCR Anchor line — skip until next standard code
+    if (CCR_RE.test(line)) {
+      skipUntilCode = true;
+      continue;
+    }
+
+    // Standard code line
+    const m = line.match(STD_CODE_RE);
+    if (m) {
+      saveStandard();
+      skipUntilCode = false;
+      currentStandard = { code: m[1], text: m[2], locations: [] };
+      collectingText = true;
+      continue;
+    }
+
+    if (skipUntilCode) continue;
+    if (!currentStandard) continue;
+
+    // "Not addressed" line
+    if (line === NOT_ADDRESSED) {
+      collectingText = false;
+      currentUnit = null;
+      continue;
+    }
+
+    // Semester / course line
+    if (SEMESTER_RE.test(line)) {
+      collectingText = false;
+      currentSemester = line;
+      currentUnit = null;
+      continue;
+    }
+
+    // Unit line
+    if (UNIT_RE.test(line)) {
+      collectingText = false;
+      if (currentSemester) {
+        const existing = currentStandard.locations.find(
+          l => l.semester === currentSemester && l.unit === line
+        );
+        if (existing) {
+          currentUnit = existing;
+        } else {
+          currentUnit = { semester: currentSemester, unit: line, lessons: [] };
+          currentStandard.locations.push(currentUnit);
+        }
+      }
+      continue;
+    }
+
+    // Remaining: standard text continuation or lesson
+    if (collectingText) {
+      currentStandard.text += ' ' + line;
+    } else if (currentUnit) {
+      currentUnit.lessons.push(line);
+    }
+  }
+
+  saveStandard();
+  return result;
+}
+
+function buildXlsx(parsed, grade, state) {
+  const wb = XLSX.utils.book_new();
+
+  const BURGUNDY  = '8C1D40';
+  const WHITE     = 'FFFFFF';
+  const ASU_BLACK = '3B3838';
+  const DARK_GREY = '948F8F';
+  const TRUE_BLK  = '000000';
+  const ALT_ROW   = 'E8E8E8';
+  const NOT_BG    = 'EBEBEB';
+  const BORDER_C  = 'C1C1C1';
+
+  const thin = { style: 'thin', color: { rgb: BORDER_C } };
+  const border = { top: thin, bottom: thin, left: thin, right: thin };
+
+  function mkFont(opts) {
+    return { name: 'Open Sans', sz: opts.sz || 9, bold: !!opts.bold, italic: !!opts.italic, color: { rgb: opts.color || TRUE_BLK } };
+  }
+
+  function mkFill(rgb) {
+    // Always return an explicit fill — undefined fills are ignored by xlsx-js-style
+    return { fgColor: { rgb: rgb || 'FFFFFF' }, patternType: 'solid' };
+  }
+
+  function mkAlign(h, v, wrap) {
+    return { horizontal: h || 'left', vertical: v || 'top', wrapText: wrap !== false };
+  }
+
+  const hdrStyle = {
+    font: mkFont({ sz:10, bold:true, color: WHITE }),
+    fill: mkFill(BURGUNDY),
+    alignment: mkAlign('center','center',true),
+    border
+  };
+
+  const strandStyle = {
+    font: mkFont({ sz:10, bold:true, color: WHITE }),
+    fill: mkFill(BURGUNDY),
+    alignment: mkAlign('left','center',false),
+    border
+  };
+
+  function rowStyle(isAlt, isCode, isNA, isDash) {
+    // "not addressed" rows use the same alternating band as regular rows (just different font)
+    const bg = isAlt ? ALT_ROW : 'FFFFFF';
+    return {
+      font: mkFont({
+        color: isNA || isDash ? DARK_GREY : (isCode ? BURGUNDY : TRUE_BLK),
+        bold: isCode && !isNA,
+        italic: isNA || isDash
+      }),
+      fill: mkFill(bg),
+      alignment: mkAlign(isDash ? 'center' : 'left', 'top', true),
+      border
+    };
+  }
+
+  const wsData = [];
+  const merges = [];
+  let rowIdx = 0;
+
+  function addRow(cells) {
+    wsData.push(cells);
+    rowIdx++;
+  }
+
+  // Title row — merged across all 5 columns
+  const titleStyle = {
+    font: mkFont({ sz:12, bold:true, color: WHITE }),
+    fill: mkFill(BURGUNDY),
+    alignment: mkAlign('left','center',false),
+    border
+  };
+  const titleText = `${grade} ${state}: Edmentum`;
+  addRow([titleText,'','','',''].map((v,i) => ({ v: i===0?v:'', s: titleStyle })));
+  merges.push({ s:{r:0,c:0}, e:{r:0,c:4} });
+
+  const headers = ['Standard Code','NC Standard Text','PLATO Course','Unit','Lesson(s) / Activity'];
+  addRow(headers.map(v => ({ v, s: hdrStyle })));
+
+  let alt = false;
+
+  for (const strand of (parsed.strands || [])) {
+    const sName = (strand.name || '').toUpperCase();
+    const strandCells = [sName,'','','',''].map((v,i) => ({ v: i===0?v:'', s: strandStyle }));
+    wsData.push(strandCells);
+    merges.push({ s:{r:rowIdx,c:0}, e:{r:rowIdx,c:4} });
+    rowIdx++;
+    alt = false;
+
+    for (const std of (strand.standards || [])) {
+      const isNA = !std.locations || std.locations.length === 0;
+      const isAlt = alt;
+
+      if (isNA) {
+        addRow([
+          { v: std.code || '', s: rowStyle(isAlt, false, true, false) },
+          { v: std.text  || '', s: rowStyle(isAlt, false, true, false) },
+          { v: '—',            s: rowStyle(isAlt, false, true, true)  },
+          { v: '—',            s: rowStyle(isAlt, false, true, true)  },
+          { v: 'The selected PLATO curriculum does not address this learning expectation.', s: rowStyle(isAlt, false, true, false) }
+        ]);
+      } else {
+        let first = true;
+        for (const loc of std.locations) {
+          const lessons = (loc.lessons || []).map(l => '• ' + l).join('\n');
+          // Format "PLATO Course English 7, Semester A v4.0" as two lines
+          const semDisplay = (loc.semester || '').replace(/, (Semester )/, ',\n$1');
+          addRow([
+            { v: first ? (std.code||'') : '', s: rowStyle(isAlt, first, false, false) },
+            { v: first ? (std.text||'') : '', s: rowStyle(isAlt, false, false, false) },
+            { v: semDisplay,                  s: rowStyle(isAlt, false, false, false) },
+            { v: loc.unit || '',              s: rowStyle(isAlt, false, false, false) },
+            { v: lessons,                     s: rowStyle(isAlt, false, false, false) }
+          ]);
+          first = false;
+        }
+      }
+      alt = !alt;
+    }
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData.map(r => r.map(c => c.v)));
+
+  ws['!cols'] = [14,50,26,38,42].map(w => ({ wch: w }));
+  ws['!merges'] = merges;
+  ws['!freeze'] = { xSplit:0, ySplit:2 };
+
+  for (let r = 0; r < wsData.length; r++) {
+    for (let c = 0; c < 5; c++) {
+      const addr = XLSX.utils.encode_cell({r,c});
+      if (!ws[addr]) ws[addr] = { v:'', t:'s' };
+      ws[addr].s = wsData[r][c].s;
+    }
+  }
+
+  const sheetName = (grade + ' PLATO').slice(0,31);
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+  const safeName = s => s.replace(/[^a-zA-Z0-9_\-]/g,'_');
+  const outName = `${safeName(state)}_${safeName(grade)}_PLATO_Alignment.xlsx`;
+  const wbout = XLSX.write(wb, { bookType:'xlsx', type:'array', cellStyles:true });
+  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = outName;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+convertBtn.addEventListener('click', async () => {
+  const grade = document.getElementById('gradeInput').value.trim() || 'Grade 7 ELA';
+  const state = document.getElementById('stateInput').value.trim()  || 'North Carolina';
+
+  if (!selectedFile) return;
+
+  convertBtn.disabled = true;
+  progressWrap.style.display = 'flex';
+  hideStatus();
+
+  try {
+    setProgress(5, 'Loading PDF…');
+    showStatus('info', 'Reading PDF…');
+
+    const arrayBuffer = await selectedFile.arrayBuffer();
+
+    setProgress(15, 'Extracting text…');
+    showStatus('info', 'Extracting text from PDF…');
+
+    const text = await extractPdfText(arrayBuffer, (p, total) => {
+      const pct = 15 + Math.round((p / total) * 45);
+      setProgress(pct, `Extracting page ${p} of ${total}…`);
+    });
+
+    setProgress(62, 'Parsing standards…');
+    showStatus('info', 'Parsing standards and alignment data…');
+
+    const parsed = parseEdmentumText(text);
+
+    const totalStandards = (parsed.strands || []).reduce((n, s) => n + s.standards.length, 0);
+
+    if (totalStandards === 0) {
+      throw new Error('No standards found. Make sure this is an Edmentum/PLATO correlation PDF with NC standards.');
+    }
+
+    setProgress(80, 'Building Excel…');
+    showStatus('info', 'Building your Excel file…');
+
+    buildXlsx(parsed, grade, state);
+
+    setProgress(100, 'Done');
+    showStatus('success', `Done! Found ${totalStandards} standards across ${parsed.strands.length} strand(s). Your Excel file has downloaded.`);
+
+  } catch(e) {
+    showStatus('error', e.message || 'Something went wrong. Please try again.');
+    setProgress(0, '');
+    progressWrap.style.display = 'none';
+  } finally {
+    convertBtn.disabled = false;
+    checkReady();
+  }
+});
+</script>
+</body>
+</html>
